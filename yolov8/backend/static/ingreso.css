@@ -1,0 +1,87 @@
+/* Reset básico */
+body, h2, form, input, button, a {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
+
+/* Fondo */
+body {
+    background: linear-gradient(135deg, #174b4c, #47622b);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Caja del login */
+div {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    width: 300px;
+    text-align: center;
+}
+
+/* Título */
+h2 {
+    margin-bottom: 20px;
+    color: #2d3436;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    outline: none;
+    transition: border 0.3s;
+}
+
+input:focus {
+    border: 1px solid #0a1818;
+}
+
+/* Botón */
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background: #0a1818;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #0a1818;
+}
+
+/* Link de registro */
+a {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #0a1818;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#loginMensaje, #mensaje {
+    background: none;   /* quita el fondo blanco */
+    border: none;       /* quita el borde si lo tuviera */
+    padding: 0;         /* elimina padding innecesario */
+    margin-top: 10px;   /* solo espacio respecto al formulario */
+    color: red;         /* color por defecto del mensaje */
+    font-size: 14px;    /* tamaño del texto */
+}

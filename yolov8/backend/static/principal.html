@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cutting Vision</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 30px;
+            height: 30px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+        }
+
+        @-webkit-keyframes spin {
+            0% {
+                -webkit-transform: rotate(0deg);
+            }
+            100% {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .info-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .info-tooltip.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center h-screen p-4">
+
+    <div class="panel flex flex-col lg:flex-row items-center justify-center p-6 bg-gray-800 rounded-xl shadow-lg w-full max-w-5xl h-[90%] space-y-6 lg:space-y-0 lg:space-x-8">
+
+        <div class="flex flex-col items-center w-full lg:w-1/2 h-full">
+            <div class="video-container flex flex-col items-center w-full h-full justify-center">
+                <h2 class="text-xl font-semibold mb-2 text-green-400">Video en Vivo</h2>
+                <img id="video-stream"
+                     src="http://127.0.0.1:8000/video_feed"
+                     alt="Video en Vivo"
+                     class="rounded-xl w-full h-full border-4 border-green-500 shadow-md object-contain">
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center w-full lg:w-1/2 space-y-4">
+            <div class="flex flex-col items-center justify-center p-4 bg-gray-700 rounded-xl shadow-lg w-full relative">
+                <h3 class="text-lg font-bold text-gray-200">Aguacates totales</h3>
+                <span id="total-count" class="text-2xl font-bold text-green-400 mt-2">0</span>
+            </div>
+            <div class="flex flex-col items-center justify-center p-4 bg-gray-700 rounded-xl shadow-lg w-full relative">
+                <h3 class="text-lg font-bold text-gray-200">Buenos</h3>
+                <span id="buenos-count" class="text-2xl font-bold text-green-400 mt-2">0</span>
+            </div>
+            <div class="flex flex-col items-center justify-center p-4 bg-gray-700 rounded-xl shadow-lg w-full relative">
+                <div class="flex items-center space-x-2 z-10">
+                    <h3 class="text-lg font-bold text-gray-200 relative">Roña negra</h3>
+                    <span class="info-icon cursor-pointer text-blue-400 hover:text-blue-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2h1a1 1 0 001-1V9a1 1 0 00-1-1H9a1 1 0 00-1 1zm2 4a1 1 0 100 2h1a1 1 0 100-2h-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                </div>
+                <span id="sarna-count" class="text-2xl font-bold text-red-400 mt-2">0</span>
+                <div
+                    class="info-tooltip absolute top-full left-1/2 -translate-x-1/2 mt-2 p-3 bg-gray-900 text-gray-200 text-sm rounded-lg shadow-xl w-64 z-20">
+                    <p>La **roña negra** es una enfermedad fúngica que causa manchas oscuras y ásperas en la piel del aguacate. Afecta la apariencia y puede reducir su valor comercial.</p>
+                </div>
+            </div>
+            <div class="flex flex-col items-center justify-center p-4 bg-gray-700 rounded-xl shadow-lg w-full relative">
+                <div class="flex items-center space-x-2 z-10">
+                    <h3 class="text-lg font-bold text-gray-200 relative">Antracnosis</h3>
+                    <span class="info-icon cursor-pointer text-blue-400 hover:text-blue-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2h1a1 1 0 001-1V9a1 1 0 00-1-1H9a1 1 0 00-1 1zm2 4a1 1 0 100 2h1a1 1 0 100-2h-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                </div>
+                <span id="antracnosis-count" class="text-2xl font-bold text-red-400 mt-2">0</span>
+                <div
+                    class="info-tooltip absolute top-full left-1/2 -translate-x-1/2 mt-2 p-3 bg-gray-900 text-gray-200 text-sm rounded-lg shadow-xl w-64 z-20">
+                    <p>La **antracnosis** es una enfermedad fúngica que afecta la pulpa del aguacate, causando la pudrición y deterioro interno del fruto.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="botones mt-4 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+        <div class="flex items-center space-x-2">
+            <div id="loader" class="loader hidden"></div>
+            <span id="status-text" class="text-lg font-semibold text-gray-400">Esperando...</span>
+        </div>
+        <button id="salir"
+            class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 transform hover:scale-105">Salir</button>
+    </div>
+
+    <script src="eventos.js"></script>
+</body>
+
+</html>

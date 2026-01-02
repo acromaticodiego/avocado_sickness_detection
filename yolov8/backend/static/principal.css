@@ -1,0 +1,103 @@
+/* Fondo con gradiente lineal: verde -> naranja -> gris */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: linear-gradient(to bottom, #174b4c, #47622b, #0a1818);
+}
+
+/* Panel fijo en la esquina inferior izquierda */
+.panel {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  width: min(90vw, 520px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Contenedor de imagen encima del botón */
+.image-container {
+  width: 100%;           /* ocupar todo el ancho del panel */
+  aspect-ratio: 18 / 16;  /* formato vertical (parado) */
+  background: rgba(255,255,255,0.9);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* llena todo el contenedor */
+  display: block;
+}
+
+/* Botón Escanear */
+.boton {
+  align-self: flex-start;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #333;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: filter 0.2s ease, transform 0.02s ease;
+}
+
+.boton:hover {
+  filter: brightness(1.1);
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+
+/* Contenedor de botones */
+.botones {
+  display: flex;
+  gap: 10px;   /* espacio entre botones */
+}
+
+/* Ambos botones comparten el mismo estilo base */
+.boton {
+  flex: 1;                 /* que se repartan el espacio */
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  background: #333;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  transition: filter 0.2s ease, transform 0.02s ease;
+}
+
+.boton:hover {
+  filter: brightness(1.1);
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+/* Opcional: darle color distinto al botón salir */
+#salir {
+  background: #174b4c;  /* rojo oscuro */
+}
+#salir:hover {
+  filter: brightness(1.2);
+}

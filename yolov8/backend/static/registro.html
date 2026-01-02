@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Registro</title>
+    <link rel="stylesheet" href="registro.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Registro</h2>
+        <form id="registroForm">
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="email" name="email" placeholder="Correo electrónico" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <input type="number" name="edad" placeholder="Edad" required>
+            <button type="submit">Registrar</button>
+        </form>
+
+        <div style="margin-top: 10px;">
+            <button id="volverBtn" type="button">Volver</button>
+        </div>
+
+       
+        <div id="mensaje"></div>
+    </div>
+
+    <script src="eventos.js"></script>
+    <script>
+        // Evento para redirigir al hacer clic en Volver
+        const volverBtn = document.getElementById("volverBtn");
+        if (volverBtn) {
+            volverBtn.addEventListener("click", () => {
+                window.location.href = "ingreso.html";
+            });
+        }
+    </script>
+</body>
+</html>
