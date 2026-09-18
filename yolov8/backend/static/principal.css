@@ -1,103 +1,108 @@
-/* Fondo con gradiente lineal: verde -> naranja -> gris */
-html, body {
-  height: 100%;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --bg-hass: #080f09;
+  --bg-surface: #101c12;
+  --border-avocado: rgba(74, 222, 128, 0.18);
+  --pulp-green: #84cc16;
+  --pulp-lime: #a3e635;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
+  font-family: var(--font-main);
+  background-color: var(--bg-hass);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(34, 197, 94, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(132, 204, 22, 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(16, 28, 18, 0.5) 0px, transparent 100%);
+  color: #f1f5f9;
   margin: 0;
+  padding: 0;
   min-height: 100vh;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  background: linear-gradient(to bottom, #174b4c, #47622b, #0a1818);
+  overflow-x: hidden;
 }
 
-/* Panel fijo en la esquina inferior izquierda */
-.panel {
-  position: fixed;
-  left: 16px;
-  bottom: 16px;
-  width: min(90vw, 520px);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+/* Glassmorphism cards */
+.glass-card {
+  background: rgba(16, 28, 18, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(74, 222, 128, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  transition: all 0.25s ease-in-out;
 }
 
-/* Contenedor de imagen encima del botón */
-.image-container {
-  width: 100%;           /* ocupar todo el ancho del panel */
-  aspect-ratio: 18 / 16;  /* formato vertical (parado) */
-  background: rgba(255,255,255,0.9);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.glass-card:hover {
+  border-color: rgba(132, 204, 22, 0.35);
+  box-shadow: 0 10px 40px -10px rgba(74, 222, 128, 0.12);
 }
 
-.image-container img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;   /* llena todo el contenedor */
-  display: block;
+.glass-panel {
+  background: rgba(12, 22, 14, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(74, 222, 128, 0.2);
 }
 
-/* Botón Escanear */
-.boton {
-  align-self: flex-start;
-  padding: 12px 18px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background: #333;
-  border: none;
-  border-radius: 10px;
+/* Video glow effect */
+.video-glow {
+  box-shadow: 0 0 35px -5px rgba(34, 197, 94, 0.25), inset 0 0 15px rgba(34, 197, 94, 0.1);
+}
+
+/* Pulsing online badge */
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.6;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d170e;
+}
+::-webkit-scrollbar-thumb {
+  background: #22542a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #388445;
+}
+
+/* Range input styling */
+input[type=range] {
+  -webkit-appearance: none;
+  background: #1f3823;
+  border-radius: 8px;
+  height: 6px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #a3e635;
   cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: filter 0.2s ease, transform 0.02s ease;
+  box-shadow: 0 0 8px rgba(163, 230, 53, 0.6);
+  transition: transform 0.15s ease;
 }
-
-.boton:hover {
-  filter: brightness(1.1);
-}
-
-.boton:active {
-  transform: translateY(1px);
-}
-
-
-/* Contenedor de botones */
-.botones {
-  display: flex;
-  gap: 10px;   /* espacio entre botones */
-}
-
-/* Ambos botones comparten el mismo estilo base */
-.boton {
-  flex: 1;                 /* que se repartan el espacio */
-  padding: 12px 18px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  background: #333;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  transition: filter 0.2s ease, transform 0.02s ease;
-}
-
-.boton:hover {
-  filter: brightness(1.1);
-}
-
-.boton:active {
-  transform: translateY(1px);
-}
-
-/* Opcional: darle color distinto al botón salir */
-#salir {
-  background: #174b4c;  /* rojo oscuro */
-}
-#salir:hover {
-  filter: brightness(1.2);
+input[type=range]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
 }

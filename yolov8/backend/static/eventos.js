@@ -4,44 +4,118 @@ document.addEventListener("DOMContentLoaded", () => {
     const salirButton = document.getElementById('salir');
     const loginUrl = "ingreso.html";
     const statusText = document.getElementById('status-text');
+    const selectCamara = document.getElementById('select-camara');
     
     // --- Lógica para el streaming de video en tiempo real ---
     if (video) {
-        // Conectamos el elemento <video> directamente a la URL del stream de FastAPI.
-        video.src = "http://127.0.0.1:8000/video_feed";
-        video.play(); // Esto inicia la reproducción del stream.
-        
-        // El resto del código de escaneo con setInterval ya no es necesario.
-        // La detección, el seguimiento y el conteo ocurren en el servidor.
-        
-        // Opcional: Manejar el estado de la conexión
-        video.addEventListener('loadstart', () => {
-            if (statusText) statusText.textContent = "Conectando al stream...";
-        });
-        
-        video.addEventListener('error', (e) => {
-            console.error("Error al conectar al stream de video:", e);
+        // Solo asignar src si el elemento no tiene ya /video_feed asignado en el HTML
+        if (!video.getAttribute("src") || video.getAttribute("src") === "") {
+            video.src = "/video_feed";
+        }
+
+        video.onerror = () => {
+            console.error("Error al conectar al stream de video");
             if (statusText) {
                 statusText.textContent = "Error: No se pudo conectar al stream de video.";
                 statusText.classList.add('text-red-500');
             }
+        };
+
+        video.onload = () => {
+            if (statusText) {
+                statusText.textContent = "Conexión establecida.";
+                statusText.classList.remove('text-red-500');
+            }
+        };
+    }
+
+    // --- Selector dinámico de cámaras ---
+    if (selectCamara) {
+        // Cargar cámaras disponibles desde el backend
+        fetch("/camaras")
+            .then(res => res.json())
+            .then(data => {
+                if (data.camaras_disponibles && data.camaras_disponibles.length > 0) {
+                    selectCamara.innerHTML = "";
+                    data.camaras_disponibles.forEach(idx => {
+                        const opt = document.createElement("option");
+                        opt.value = idx;
+                        opt.textContent = idx === 1 ? `Cámara USB (Índice ${idx})` :
+                                          idx === 0 ? `Cámara PC / Integrada (Índice ${idx})` :
+                                          `Cámara Externa (Índice ${idx})`;
+                        if (idx === data.camara_actual) {
+                            opt.selected = true;
+                        }
+                        selectCamara.appendChild(opt);
+                    });
+                }
+            })
+            .catch(err => console.warn("No se pudo obtener lista de cámaras:", err));
+
+        // Evento al cambiar de cámara en el select
+        selectCamara.addEventListener("change", async (e) => {
+            const nuevoIndice = e.target.value;
+            try {
+                const res = await fetch(`/camaras/seleccionar/${nuevoIndice}`, { method: "POST" });
+                if (res.ok) {
+                    // Recargar stream con timestamp para evitar cache
+                    if (video) {
+                        video.src = `/video_feed?t=${Date.now()}`;
+                    }
+                } else {
+                    alert("No se pudo cambiar a la cámara seleccionada.");
+                }
+            } catch (err) {
+                console.error("Error al cambiar cámara:", err);
+            }
         });
-        
-        video.addEventListener('canplay', () => {
-            if (statusText) statusText.textContent = "Conexión establecida.";
+    }
+
+    // --- Control de umbral de confianza (sensibilidad) ---
+    const sliderConfianza = document.getElementById("confianza-slider");
+    const valConfianza = document.getElementById("confianza-val");
+    if (sliderConfianza && valConfianza) {
+        sliderConfianza.addEventListener("input", (e) => {
+            valConfianza.textContent = `${e.target.value}%`;
+        });
+
+        sliderConfianza.addEventListener("change", async (e) => {
+            const valorDecimal = (parseFloat(e.target.value) / 100).toFixed(2);
+            try {
+                await fetch(`/confianza?valor=${valorDecimal}`, { method: "POST" });
+                console.log("Confianza actualizada:", valorDecimal);
+            } catch (err) {
+                console.error("Error al actualizar umbral de confianza:", err);
+            }
+        });
+    }
+
+    // --- Botón reiniciar conteo ---
+    const btnReset = document.getElementById("btn-reiniciar-conteo");
+    if (btnReset) {
+        btnReset.addEventListener("click", async () => {
+            try {
+                const res = await fetch("/reiniciar_contadores", { method: "POST" });
+                if (res.ok) {
+                    document.getElementById("total-count").textContent = "0";
+                    document.getElementById("buenos-count").textContent = "0";
+                    document.getElementById("sarna-count").textContent = "0";
+                    document.getElementById("antracnosis-count").textContent = "0";
+                }
+            } catch (err) {
+                console.error("Error al reiniciar contadores:", err);
+            }
         });
     }
 
     // --- Botón salir ---
     if (salirButton) {
         salirButton.addEventListener("click", () => {
-            // No es necesario detener el stream de la cámara, ya que el navegador
-            // lo cerrará automáticamente al salir de la página.
             window.location.href = loginUrl;
         });
     }
 
-    // --- El resto de tu lógica para formularios y tooltips se mantiene igual ---
+    // --- Formularios de registro y login ---
     const registroForm = document.getElementById("registroForm");
     const registroMensaje = document.getElementById("mensaje");
     if (registroForm) {
@@ -82,7 +156,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/usuarios", {
+            const response = await fetch("/usuarios", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -115,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         try {
-            const response = await fetch("http://127.0.0.1:8000/ingreso", {
+            const response = await fetch("/ingreso", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -124,8 +198,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             const data = await response.json();
-            console.log("Respuesta de FastAPI:", data);
-
             if (response.ok) {
                 window.location.href = "principal.html";
             } else {
@@ -138,17 +210,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
-// Mantenemos la función para los contadores, ya que se actualiza cada 2 segundos.
+// Mantenemos la función para los contadores, actualizada cada 2 segundos
 async function actualizarContadores() {
     try {
-        const response = await fetch("http://127.0.0.1:8000/get_analisis");
+        const response = await fetch("/get_analisis");
+        if (!response.ok) return;
         const data = await response.json();
 
-        document.getElementById("total-count").textContent = data.total || 0;
-        document.getElementById("buenos-count").textContent = data.por_etiqueta["sano"] || 0;
-        document.getElementById("sarna-count").textContent = data.por_etiqueta["sarna-negra"] || 0;
-        document.getElementById("antracnosis-count").textContent = data.por_etiqueta["antracnosis"] || 0;
+        const totalEl = document.getElementById("total-count");
+        const buenosEl = document.getElementById("buenos-count");
+        const sarnaEl = document.getElementById("sarna-count");
+        const antracnosisEl = document.getElementById("antracnosis-count");
+
+        if (totalEl) totalEl.textContent = data.total || 0;
+        if (buenosEl && data.por_etiqueta) buenosEl.textContent = data.por_etiqueta["sano"] || 0;
+        if (sarnaEl && data.por_etiqueta) sarnaEl.textContent = data.por_etiqueta["sarna-negra"] || 0;
+        if (antracnosisEl && data.por_etiqueta) antracnosisEl.textContent = data.por_etiqueta["antracnosis"] || 0;
 
     } catch (error) {
         console.error("Error al obtener contadores:", error);
