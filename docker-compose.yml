@@ -1,0 +1,32 @@
+services:
+  avocato:
+    build: .
+    image: avocato:latest
+    container_name: avocato
+    restart: unless-stopped
+    ports:
+      # 8001 en el equipo porque el 8000 suele estar ocupado por otros
+      # proyectos; dentro del contenedor la app siempre escucha en el 8000.
+      - "8001:8000"
+    environment:
+      # Indice de la camara que se usa al arrancar. Sin esta variable el
+      # backend prefiere la USB externa (indice 1) si la encuentra.
+      CAMERA_INDEX: "${CAMERA_INDEX:-0}"
+    volumes:
+      # Datos que deben sobrevivir a un redespliegue de la imagen.
+      - ./data/uploads:/app/uploads
+      - ./data/result:/app/result
+      - ./data/recortes:/app/recortes
+      - ./data/sqlitebase:/app/sqlitebase
+
+    # --- Camara en vivo ---
+    # El contenedor no ve la webcam por defecto. En Linux se expone el
+    # dispositivo descomentando estas lineas (ajusta el numero de video0):
+    #
+    # devices:
+    #   - "/dev/video0:/dev/video0"
+    #
+    # En Windows y macOS, Docker Desktop no puede pasar una camara USB al
+    # contenedor. Ahi el contenedor sirve la interfaz, el login y el analisis
+    # de fotos, pero /video_feed no encontrara camara: para el streaming en
+    # vivo hay que ejecutar el backend directamente en el equipo.
