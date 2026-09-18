@@ -1,0 +1,17 @@
+# ByteTrack ajustado para la inspeccion de aguacates.
+#
+# Unico cambio frente al bytetrack.yaml de ultralytics: track_buffer.
+# Por defecto son 30 fotogramas (~6 s a la velocidad de este equipo), asi que
+# al retirar un aguacate y poner otro en el mismo sitio el tracker revivia el
+# track anterior y le asignaba el mismo ID, heredando su etiqueta y sin sumar
+# la unidad nueva. Con 8 fotogramas (~1.5 s) el cambio de fruto rompe la
+# identidad, que es lo que queremos aqui: los frutos no se ocultan entre si
+# durante mucho tiempo, van de uno en uno sobre la bandeja.
+
+tracker_type: bytetrack
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 8
+match_thresh: 0.8
+fuse_score: True
