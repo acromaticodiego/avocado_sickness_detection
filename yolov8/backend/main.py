@@ -64,6 +64,7 @@ app.add_middleware(
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 UPLOADS_DIR = os.path.join(BASE_DIR, "uploads")
 RESULTS_DIR = os.path.join(BASE_DIR, "result")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 os.makedirs(RESULTS_DIR, exist_ok=True)
@@ -71,7 +72,7 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 # Static files
 app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
 app.mount("/result", StaticFiles(directory=RESULTS_DIR), name="result")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # -----------------------------------------
 # Login model
@@ -142,6 +143,38 @@ def video_feed():
     except Exception as e:
         print(f"Error inesperado en video_feed: {e}")
         raise HTTPException(status_code=500, detail="Error interno al iniciar streaming.")
+
+# -----------------------------------------
+# GESTIÓN Y SELECCIÓN DE CÁMARAS
+# -----------------------------------------
+@app.get("/camaras")
+def obtener_camaras():
+    return {
+        "camara_actual": camara_manager.camara_index,
+        "camaras_disponibles": camara_manager.get_camaras_disponibles()
+    }
+
+@app.post("/camaras/seleccionar/{indice}")
+def seleccionar_camara(indice: int):
+    if camara_manager.cambiar_camara(indice):
+        return {
+            "mensaje": f"Cámara cambiada exitosamente al índice {indice}",
+            "camara_actual": camara_manager.camara_index
+        }
+    raise HTTPException(status_code=400, detail=f"No se pudo conectar a la cámara en índice {indice}")
+
+@app.post("/confianza")
+def ajustar_confianza(valor: float):
+    camara_manager.set_confianza(valor)
+    return {"confianza_actual": camara_manager.confianza}
+
+@app.post("/reiniciar_contadores")
+def reiniciar_contadores_endpoint():
+    camara_manager.reset_contadores()
+    return {
+        "mensaje": "Contadores reiniciados a 0",
+        "contadores": control_model.get_contadores()
+    }
 
 # -----------------------------------------
 # Procesar imagen subida (usando procesar_imagen del camara.py)
