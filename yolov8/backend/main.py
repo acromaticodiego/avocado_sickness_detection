@@ -1,14 +1,13 @@
-# main actualizado para usar el nuevo camara.py sin detect.py
 import os
 import time
 import uuid
 import cv2
-import pandas as pd
 from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse, StreamingResponse
 
+from seguridad import verificar_password, hashear_password, es_hash
 from base_usuarios import (
     crear_usuario,
     listar_usuarios,
@@ -22,7 +21,6 @@ from modelos import UsuarioCreate, UsuarioDB
 from pydantic import BaseModel
 
 # ⬅ YA NO VIENE DE detect.py
-# from detect import procesar_imagen   ❌  BORRADO
 
 # ✔ Ahora viene del camara.py unificado
 from camara import CamaraManager, procesar_imagen
@@ -89,16 +87,28 @@ def login_endpoint(data: LoginData):
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-        "SELECT * FROM usuarioau WHERE username = ? AND password = ?",
-        (data.username, data.password)
+        "SELECT id, password FROM usuarioau WHERE username = ?",
+        (data.username,)
     )
     usuario = cursor.fetchone()
-    conn.close()
 
-    if usuario:
-        return {"mensaje": "Login exitoso"}
-    else:
-        raise HTTPException(status_code=401, detail="Usuario no encontrado")
+    if usuario is None or not verificar_password(data.password, usuario["password"]):
+        conn.close()
+        # Mismo mensaje para usuario inexistente y contrasena incorrecta, para no
+        # revelar que nombres de usuario existen.
+        raise HTTPException(status_code=401, detail="Usuario o contrasena incorrectos")
+
+    # Migracion en caliente: si la contrasena estaba en texto plano, este login
+    # correcto es la ocasion para guardarla ya hasheada.
+    if not es_hash(usuario["password"]):
+        cursor.execute(
+            "UPDATE usuarioau SET password = ? WHERE id = ?",
+            (hashear_password(data.password), usuario["id"])
+        )
+        conn.commit()
+
+    conn.close()
+    return {"mensaje": "Login exitoso"}
 
 # -----------------------------------------
 # Crear usuario
@@ -201,10 +211,6 @@ async def procesar_imagen_endpoint(file: UploadFile = File(...)):
 # -----------------------------------------
 @app.get("/get_analisis")
 async def get_analisis():
-    return control_model.get_contadores()
-
-@app.get("/contadores")
-def contadores_endpoint():
     return control_model.get_contadores()
 
 # -----------------------------------------

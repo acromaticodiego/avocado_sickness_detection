@@ -1,6 +1,8 @@
 import sqlite3
 import os
 
+from seguridad import hashear_password
+
 # --- Configuración de la base de datos ---
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FOLDER = os.path.join(BASE_DIR, "sqlitebase")
@@ -32,25 +34,42 @@ def crear_tabla():
 
 # --- Agregar usuario ---
 def agregar_usuario(usuario: dict):
+    """Guarda el usuario con la contrasena hasheada y la devuelve fuera del resultado."""
     conn = get_db()
     cursor = conn.cursor()
     cursor.execute(
-    "INSERT INTO usuarioau (username, correo, password, edad) VALUES (?, ?, ?, ?)",
-    (usuario["nombre"], usuario["email"], usuario["password"], usuario["edad"])  # 👈 usa email
+        "INSERT INTO usuarioau (username, correo, password, edad) VALUES (?, ?, ?, ?)",
+        (
+            usuario["nombre"],
+            usuario["email"],
+            hashear_password(usuario["password"]),
+            usuario["edad"],
+        )
     )
     conn.commit()
     user_id = cursor.lastrowid
     conn.close()
-    return {**usuario, "id": user_id}
+
+    publico = {clave: valor for clave, valor in usuario.items() if clave != "password"}
+    return {**publico, "id": user_id}
 
 # --- Obtener todos los usuarios ---
 def obtener_usuarios():
+    """Lista los usuarios sin la contrasena y con los nombres de campo publicos."""
     conn = get_db()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM usuarioau")
+    cursor.execute("SELECT id, username, correo, edad FROM usuarioau")
     usuarios = cursor.fetchall()
     conn.close()
-    return [dict(u) for u in usuarios]
+    return [
+        {
+            "id": u["id"],
+            "nombre": u["username"],
+            "email": u["correo"],
+            "edad": u["edad"],
+        }
+        for u in usuarios
+    ]
 
 # --- Obtener usuario por ID ---
 def obtener_usuario_por_id(usuario_id: int):
