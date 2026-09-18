@@ -1,22 +1,31 @@
-# ignorar archivos de python compilados
+# Python compilado
 __pycache__/
-*.pyc
+*.py[cod]
 
-# ignorar archivos y carpetas de configuracion de entorno virtuales
+# Entornos virtuales y secretos
 venv/
+.venv/
+env/
 .env
 
-# ignora archivos de configuracion de docker
-dockerfile
-.dockerignore
-
-# ignora archivos de control de versiones
-.git
+# Control de versiones
+.git/
 .gitignore
 
-# ignora carpetas de testeo y ejemplos
-tests/
-examples/
+# Ficheros de Docker: no tienen que entrar en la imagen
+Dockerfile
+docker-compose.yml
+.dockerignore
 
-# igonora otros archivos inncesarios
-*.logs
+# Datos generados en ejecucion. Se montan como volumenes desde docker-compose,
+# asi que copiarlos a la imagen solo la engorda y arrastra datos viejos.
+data/
+yolov8/backend/uploads/
+yolov8/backend/result/
+yolov8/backend/recortes/
+yolov8/backend/sqlitebase/
+
+# Documentacion y registros
+*.md
+*.log
+docs/
