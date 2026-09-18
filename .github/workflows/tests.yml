@@ -1,0 +1,55 @@
+name: tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  unitarias:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      # La suite unitaria no necesita torch ni los pesos del modelo: cuando
+      # ultralytics no esta instalado, conftest.py lo sustituye por un doble.
+      # Instalar solo esto deja el trabajo en menos de un minuto.
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install opencv-python-headless==4.12.0.88 numpy==2.2.6 \
+                      fastapi==0.119.1 pydantic==2.12.3 bcrypt==5.0.0
+          pip install -r requirements-dev.txt
+
+      - name: Ejecutar pruebas
+        run: pytest
+
+  imagen-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Construir la imagen es la unica forma de no repetir lo que ya paso una
+      # vez: un requirements.txt ilegible y un opencv equivocado rompieron el
+      # contenedor sin que nada mas lo notara.
+      - name: Construir la imagen
+        run: docker build -t avocato:ci .
+
+      - name: Comprobar que arranca y responde
+        run: |
+          docker run -d --name avocato -p 8000:8000 avocato:ci
+          for intento in $(seq 1 30); do
+            if curl -fs http://127.0.0.1:8000/get_analisis > /dev/null; then
+              echo "la API responde"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "la API no respondio a tiempo"
+          docker logs avocato
+          exit 1

@@ -1,0 +1,4 @@
+# Herramientas de desarrollo. Las dependencias de ejecucion estan en
+# requirements.txt; la suite unitaria no necesita torch ni el modelo, porque
+# sustituye ultralytics por un doble cuando no esta instalado.
+pytest==9.1.1
