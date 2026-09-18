@@ -25,7 +25,7 @@ async def enviar_correo_bienvenida(email_destino: EmailStr):
         recipients=[email_destino],
         body="Bienvenido a Smartvision, estas son las instrucciones del proceso de calidad.",
         subtype=MessageType.plain,
-        attachments=[os.path.join(BASE_DIR, "sqlitebase/documentos/Sama_SmartVision.pdf")]
+        attachments=[os.path.join(BASE_DIR, "documentos", "Sama_SmartVision.pdf")]
     )
 
     fm = FastMail(conf)

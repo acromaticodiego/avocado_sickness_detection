@@ -14,9 +14,16 @@ __pycache__/
 # Runtime output
 yolov8/backend/uploads/
 yolov8/backend/result/
+yolov8/backend/recortes/
 
 # OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
+# Base de datos de usuarios: contiene datos reales, no debe versionarse
+*.db
+
+# Volumenes de docker-compose
+data/
